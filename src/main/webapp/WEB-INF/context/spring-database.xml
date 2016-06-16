@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+		http://www.springframework.org/schema/aop 
+		http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+		http://www.springframework.org/schema/tx 
+		http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
+
+	<tx:annotation-driven transaction-manager="hibernateTransactionManager"/>
+	
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" 
+			destroy-method="close">
+		<property name="driverClass" value="com.mysql.jdbc.Driver"/>
+		<property name="jdbcUrl" value="jdbc:mysql://localhost:3306/podcazity"/>
+		<property name="user" value="root"/>
+		<property name="password" value="admin"/>
+		
+		<!-- C3P0 CONFIG -->
+		<property name="acquireIncrement" value="1"/>
+		<property name="minPoolSize" value="2"/>
+		<property name="maxPoolSize" value="5"/>
+		<property name="maxIdleTime" value="300"/>
+	</bean>
+	
+	<bean id="sessionFactory" 
+			class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="mappingResources">
+			<list>
+				<value>net/virux/podcazity/model/User.hbm.xml</value>
+				<value>net/virux/podcazity/model/Profile.hbm.xml</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.temp.use_jdbc_metadata_defaults">false</prop>
+				<prop key="hibernate.enable_lazy_load_no_trans">true</prop>
+				<prop key="hibernate.show_sql">true</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<!-- BEANS -->
+	
+	<!-- TRANSACTION MANAGER -->
+	
+	<bean id="txManager" 
+			class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<tx:method name="get*" read-only="true"/>
+			<tx:method name="add*" read-only="false"/>
+			<tx:method name="set*" read-only="false"/>
+			<tx:method name="delete*" read-only="false"/>
+		</tx:attributes>
+	</tx:advice>
+	
+	<aop:config>
+		<aop:pointcut expression="execution(* net.virux.podcazity.service.*Service.*(..))" 
+			id="podcazityServiceOperation"/>
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="podcazityServiceOperation"/>
+	</aop:config>	
+
+</beans>

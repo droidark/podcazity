@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd" >
+<hibernate-mapping>
+ <class name="net.virux.podcazity.model.Profile" table="pdz_profiles">
+  <id column="id_profile" name="idProfile" type="int">
+   <generator class="increment"/>
+  </id>
+  <property column="profile" name="profile" type="string"/>
+  
+  <!-- RELATIONSHIP MANY TO MANY [Table: pdz_user_profile]-->
+  <set name="users" table="pdz_user_profile" inverse="true" lazy="true" fetch="select">
+  	<key>
+  		<column name="id_profile" not-null="true"/>
+  	</key>
+  	<many-to-many entity-name="net.virux.podcazity.model.User">
+  		<column name="id_user" not-null="true"/>
+  	</many-to-many>
+  </set>
+ </class>
+</hibernate-mapping>

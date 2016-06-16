@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+ <class name="net.virux.podcazity.model.User" table="pdz_users">
+  <id column="id_user" name="idUser" type="int">
+   <generator class="increment"/>
+  </id>
+  <property column="username" name="username" type="string"/>
+  <property column="password" name="password" type="string"/>
+  <property column="alias" name="alias" type="string"/>
+  <property column="avatar_url" name="avatarUrl" type="string"/>
+  <property column="cover_url" name="coverUrl" type="string"/>
+  <property column="description" name="description" type="string"/>
+  <property column="url" name="url" type="string"/>
+  <property column="signup_date" name="signUpDate" type="java.util.Date"/>
+  <property column="state" name="state" type="string"/>
+  <property column="premium" name="premium" type="boolean"/>
+  
+  <!-- RELATIONSHIP MANY TO MANY  [Table: pdz_user_profle]-->
+  <set name="profiles" table="pdz_user_profile" inverse="false" lazy="true" 
+  		fetch="select" cascade="all">
+  	<key>
+  		<column name="id_user" not-null="true"/>
+  	</key>
+  	<many-to-many entity-name="net.virux.podcazity.model.Profile">
+  		<column name="id_profile" not-null="true"/>
+  	</many-to-many>
+  </set>  
+ </class>
+</hibernate-mapping>
